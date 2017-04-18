@@ -15,15 +15,15 @@ void Eos::calcReducedTemp(){
 }
 
 void Eos::calcReducedPress(){
-    m_reducedPressure = m_pressure/m_compound.getCriticalTemperature();
+    m_reducedPressure = m_pressure/m_compound.getCriticalPressure();
 }
 
 void Eos::calcAlpha(){
     float tempAcentric = m_compound.getAccentricFactor();
-    float temp1 = (0.37464+1.5422*tempAcentric-0.26992*pow(tempAcentric,2.0));
+    float temp1 = (0.37464 + 1.5422*tempAcentric -0.26992*pow(tempAcentric,2.0));
     float temp2 = (1-pow(m_reducedTemperature,0.5));
     
-    m_Alpha = pow(((1+temp1)*temp2),2.0);
+    m_Alpha = pow((1+temp1*temp2),2.0);
 }
 
 void Eos::calcA(){
@@ -47,22 +47,14 @@ bool Eos::calcCubicZ(){
     float c{m_A - 3*pow(m_B,2.0) - 2*m_B};
     float d{-((m_A*m_B) - pow(m_B, 2.0) - pow(m_B, 3.0))};
     
-    float X1, X2, X3;
-    
-    
-    bool answer = cubic(a, b, c, d, X1, X2 , X3);
-    
-    m_z[0] = X1;
-    m_z[1] = X2;
-    m_z[2] = X3;
-    
+    bool answer = cubic(a, b, c, d, m_z);
+
     return answer;
     
 }
 
 void Eos::solve(){
     
-    resetZ();
     calcReducedTemp();
     calcReducedPress();
     calcAlpha();
@@ -72,13 +64,14 @@ void Eos::solve(){
     bool test = calcCubicZ();
     
     if(test){
-        cout << "There are two phases.  The smallest is the gas,";
-        cout << "the largest is the liquid" << endl;
+        cout << "There are two phases.  Unless satruated only one will be stable."  << endl
+        cout << "The largest compresability is the gas,";
+        cout << "the smallest compresability is the liquid the middle is meaningless" << endl;
         for(int i = 0; i < 3; i++)
             cout << m_z[i] << endl;
     }
     else{
-        cout << "There is only one phase" << endl;
+        cout << "There is only one phase - the compresability is :";
         cout << m_z[0] << endl;
         }
     

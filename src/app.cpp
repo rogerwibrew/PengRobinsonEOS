@@ -21,7 +21,7 @@ int main(){
     cin >> critTemperature;
     cin >> factor;
     
-    Compound compound(name, pressure, temperature, factor);
+    Compound compound(name, critPressure, critTemperature, factor);
     
     Eos eos(compound);
     
